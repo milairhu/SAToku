@@ -3,12 +3,14 @@ Sudoku SAT-Solver
 As part of IA02 course, taught at UTC by Sylvain Lagrue
 """
 
+import os
 from typing import List, Tuple
 import itertools
 import pprint
 import subprocess
+import sys
 
-# alias de types
+# alias
 Variable = int
 Literal = int
 Clause = List[Literal]
@@ -16,46 +18,7 @@ Model = List[Literal]
 Clause_Base = List[Clause]
 Grid = List[List[int]]
 
-example: Grid = [
-    [5, 3, 0, 0, 7, 0, 0, 0, 0],
-    [6, 0, 0, 1, 9, 5, 0, 0, 0],
-    [0, 9, 8, 0, 0, 0, 0, 6, 0],
-    [8, 0, 0, 0, 6, 0, 0, 0, 3],
-    [4, 0, 0, 8, 0, 3, 0, 0, 1],
-    [7, 0, 0, 0, 2, 0, 0, 0, 6],
-    [0, 6, 0, 0, 0, 0, 2, 8, 0],
-    [0, 0, 0, 4, 1, 9, 0, 0, 5],
-    [0, 0, 0, 0, 8, 0, 0, 7, 9],
-]
-
-
-example2: Grid = [
-    [0, 0, 0, 0, 2, 7, 5, 8, 0],
-    [1, 0, 0, 0, 0, 0, 0, 4, 6],
-    [0, 0, 0, 0, 0, 9, 0, 0, 0],
-    [0, 0, 3, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 5, 0, 2, 0],
-    [0, 0, 0, 8, 1, 0, 0, 0, 0],
-    [4, 0, 6, 3, 0, 1, 0, 0, 9],
-    [8, 0, 0, 0, 0, 0, 0, 0, 0],
-    [7, 2, 0, 0, 0, 0, 3, 1, 0],
-]
-
-
-empty_grid: Grid = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0],
-]
-
 #### Functions provided by Mr. Lagrue
-
 
 def write_dimacs_file(dimacs: str, filename: str):
     with open(filename, "w", newline="") as cnf:
@@ -81,6 +44,8 @@ def exec_gophersat(
 
 
 #### Personal work
+
+empty_grid = [[0 for _ in range(9)] for _ in range(9)]
     
 def cell_to_variable(i: int, j: int, val: int) -> int:
     res=0
@@ -108,8 +73,8 @@ def variable_to_cell(var: int) -> Tuple[int, int, int]:
                 if (v==var):
                     return (i,j,val)
                 
-#revoir           
-def at_least_one(vars: List[int]) -> List[int] : ## retourne un ou des var, donc retourne la liste?
+           
+def at_least_one(vars: List[int]) -> List[int] : 
     res=[]
     for i in vars:
         res.append(i)
@@ -141,6 +106,7 @@ def create_cell_constraints() -> List[List[int]]:
             nv_clause=unique(range(binf,bsup+1 ))
             liste=liste+nv_clause
     return liste
+
 def create_line_constraints() -> List[List[int]]:
     liste=[]
     
@@ -154,10 +120,6 @@ def create_line_constraints() -> List[List[int]]:
             liste.append(nv_clause)
     return liste
                 
-            
-                
-        
-    
 def create_column_constraints() -> List[List[int]]:
     liste=[]
     
@@ -206,8 +168,6 @@ def generate_problem(grid: List[List[int]]) -> List[List[int]] :
 
     return res
 
-problem=generate_problem(example)
-#print(problem)
 def clauses_to_dimacs(clauses: List[List[int]], nb_vars: int) ->str:
     res=""
     res=res+"c TP3 IA02\n"
@@ -222,18 +182,13 @@ def clauses_to_dimacs(clauses: List[List[int]], nb_vars: int) ->str:
         res=res+"0 \n"
 
     return res
-dimacs=clauses_to_dimacs(problem,729) #729 variables
 
 def write_dimacs_file(dimacs: str,filename: str):
     f=open(filename,"w")
     f.write(dimacs)
     f.close()
-write_dimacs_file(dimacs,"sudoku.cnf")
 
-
-exec_gophersat("sudoku.cnf","../gophersat")
-
-def model_to_grid(model: List[int], nb_vals: int = 9) -> List[List]: 
+def model_to_grid(model: List[int]) -> List[List]:
     grid=empty_grid
 
     for litt in model[1] :
@@ -244,37 +199,34 @@ def model_to_grid(model: List[int], nb_vals: int = 9) -> List[List]:
 
     return grid
 
-
-#### Run codes
-
-
-#Exemple1
-pb1=generate_problem(example)
-dimacsex1=clauses_to_dimacs(pb1,729)
-
-write_dimacs_file(dimacsex1,"sudoku1.cnf")
-modelex1=exec_gophersat("sudoku1.cnf","../gophersat")
-
-gridex1=model_to_grid(modelex1)
-
-pprint.pprint(gridex1)
-
-
-#Exemple2
-#pb2=generate_problem(example2)
-#dimacsex2=clauses_to_dimacs(pb2,729)
-#write_dimacs_file(dimacsex2,"sudoku2.cnf")
-#modelex2=exec_gophersat("sudoku2.cnf","../gophersat")
-
-#gridex2=model_to_grid(modelex2)
-
-#pprint.pprint(gridex2)
-
-
+#To convert the content of a file into a matrix of int
+def convert_to_matrix(grid_file):
+    lines = grid_file.strip().split('\n')
+    matrix = [list(map(int, line.split())) for line in lines]
+    return matrix
 
 def main():
-    pass
+    if len(sys.argv) != 2:
+        print("Usage: python script.py <file>")
+        sys.exit(1)
 
+    file = sys.argv[1]
+    filename_without_ext = os.path.splitext(os.path.basename(file))[0]
+    cnf_file = filename_without_ext + ".cnf"
+    with open(file, 'r') as f:
+        grid_file = f.read()
+
+    matrix = convert_to_matrix(grid_file)
+    
+    pb = generate_problem(matrix)
+    dimacs = clauses_to_dimacs(pb, 729)
+
+    write_dimacs_file(dimacs, cnf_file)
+    model = exec_gophersat(cnf_file, "./gophersat.exe")
+
+    grid = model_to_grid(model)
+
+    pprint.pprint(grid)
 
 if __name__ == "__main__":
     main()
