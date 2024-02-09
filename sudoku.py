@@ -20,10 +20,6 @@ Grid = List[List[int]]
 
 #### Functions provided by Mr. Lagrue
 
-def write_dimacs_file(dimacs: str, filename: str):
-    with open(filename, "w", newline="") as cnf:
-        cnf.write(dimacs)
-
 
 def exec_gophersat(
     filename: str, cmd: str = "gophersat", encoding: str = "utf8"
@@ -184,9 +180,13 @@ def clauses_to_dimacs(clauses: List[List[int]], nb_vars: int) ->str:
     return res
 
 def write_dimacs_file(dimacs: str,filename: str):
-    f=open(filename,"w")
-    f.write(dimacs)
-    f.close()
+    # Create the cnf directory if it doesn't exist
+    os.makedirs('cnf', exist_ok=True)
+
+    # Create the path for the file in the cnf directory
+    filename = os.path.join('cnf', filename)
+    with open(filename, "w", newline="") as cnf:
+        cnf.write(dimacs)
 
 def model_to_grid(model: List[int]) -> List[List]:
     grid=empty_grid
@@ -222,6 +222,7 @@ def main():
     dimacs = clauses_to_dimacs(pb, 729)
 
     write_dimacs_file(dimacs, cnf_file)
+    cnf_file = os.path.join('cnf', cnf_file)
     model = exec_gophersat(cnf_file, "./gophersat.exe")
 
     grid = model_to_grid(model)
