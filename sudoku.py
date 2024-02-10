@@ -4,6 +4,7 @@ As part of IA02 course, taught at UTC by Sylvain Lagrue
 """
 
 import os
+import tkinter as tk
 from typing import List, Tuple
 import itertools
 import pprint
@@ -205,6 +206,25 @@ def convert_to_matrix(grid_file):
     matrix = [list(map(int, line.split())) for line in lines]
     return matrix
 
+
+def draw_grid(grid, added_elements):
+    root = tk.Tk()
+    cell_size = 20
+    canvas = tk.Canvas(root, width = cell_size*len(grid[0]), height = cell_size*len(grid))
+    canvas.pack()
+
+    for i, row in enumerate(grid):
+        for j, cell in enumerate(row):
+            x1 = j * cell_size
+            y1 = i * cell_size
+            x2 = x1 + cell_size
+            y2 = y1 + cell_size
+            color = "light green" if (i, j) in added_elements else "white"
+            canvas.create_rectangle(x1, y1, x2, y2, fill=color)
+            canvas.create_text((x1+x2)/2, (y1+y2)/2, text=str(cell))
+
+    root.mainloop()
+    
 def main():
     if len(sys.argv) != 2:
         print("Usage: python script.py <file>")
@@ -228,6 +248,15 @@ def main():
     grid = model_to_grid(model)
 
     pprint.pprint(grid)
+
+    #Get new elements
+    added_elements = []
+    for i in range(9):
+        for j in range(9):
+            if grid[i][j] != matrix[i][j]:
+                added_elements.append((i, j))
+    #Draw the grid
+    draw_grid(grid, added_elements)
 
 if __name__ == "__main__":
     main()
