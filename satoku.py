@@ -209,7 +209,8 @@ def convert_to_matrix(grid_file):
 
 def draw_grid(grid, added_elements):
     root = tk.Tk()
-    cell_size = 20
+    root.title("SAToku")
+    cell_size = 30
     canvas = tk.Canvas(root, width = cell_size*len(grid[0]), height = cell_size*len(grid))
     canvas.pack()
 
