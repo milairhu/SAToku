@@ -27,4 +27,4 @@ In V1, the file given in argument must be a file containing the grid. The grid m
 
 - The program could include the generation of Sudoku grids and eventually the solution.
 - Visual improvements.
-- 
+
