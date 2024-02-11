@@ -1,6 +1,6 @@
 # SAToku : A SAT-based Sudoku solver
 
-SAToku is a SAT-based Sudoku solver developed in Python. It uses the [Gophersat](https://github.com/crillab/gophersat) solver. This project is a part of the course **IA02** taught at the University of Technology of Compiègne (UTC) by **Prof. Sylvain Lagrue**, in 2022.
+SAToku is a SAT-based Sudoku solver developed in Python. It uses the [Gophersat](https://github.com/crillab/gophersat) solver. This project was initiated as a part of the course **IA02** taught at the University of Technology of Compiègne (UTC) by **Prof. Sylvain Lagrue**, in 2022. 
 
 ## Functionnalities
 
