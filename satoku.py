@@ -206,6 +206,40 @@ def convert_to_matrix(grid_file):
     matrix = [list(map(int, line.split())) for line in lines]
     return matrix
 
+#To get the next .cnf file name
+def get_next_cnf_file_name():
+    os.makedirs('cnf', exist_ok=True)
+
+    files = os.listdir('cnf')
+    cnf_file = f'grid{len(files) + 1}.cnf'
+    return cnf_file
+
+
+def get_sudoku_grid():
+    root = tk.Tk()
+    entries = []
+
+    for i in range(9):
+        row_entries = []
+        for j in range(9):
+            entry = tk.Entry(root, width=2)
+            entry.grid(row=i, column=j)
+            row_entries.append(entry)
+        entries.append(row_entries)
+
+    def convert_to_matrix():
+        matrix = []
+        for row_entries in entries:
+            row = [int(entry.get()) if entry.get().isdigit() else 0 for entry in row_entries]
+            matrix.append(row)
+        root.quit()
+        return matrix
+
+    button = tk.Button(root, text="Submit", command=convert_to_matrix)
+    button.grid(row=10, column=0, columnspan=9)
+
+    root.mainloop()
+    return convert_to_matrix()
 
 def draw_grid(grid, added_elements):
     root = tk.Tk()
@@ -227,37 +261,44 @@ def draw_grid(grid, added_elements):
     root.mainloop()
     
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python script.py <file>")
-        sys.exit(1)
+    root = tk.Tk()
+    root.title("SAToku")
+    entries = []
 
-    file = sys.argv[1]
-    filename_without_ext = os.path.splitext(os.path.basename(file))[0]
-    cnf_file = filename_without_ext + ".cnf"
-    with open(file, 'r') as f:
-        grid_file = f.read()
-
-    matrix = convert_to_matrix(grid_file)
-    
-    pb = generate_problem(matrix)
-    dimacs = clauses_to_dimacs(pb, 729)
-
-    write_dimacs_file(dimacs, cnf_file)
-    cnf_file = os.path.join('cnf', cnf_file)
-    model = exec_gophersat(cnf_file, "./gophersat.exe")
-
-    grid = model_to_grid(model)
-
-    pprint.pprint(grid)
-
-    #Get new elements
-    added_elements = []
     for i in range(9):
+        row_entries = []
         for j in range(9):
-            if grid[i][j] != matrix[i][j]:
-                added_elements.append((i, j))
-    #Draw the grid
-    draw_grid(grid, added_elements)
+            entry = tk.Entry(root, width=2)
+            entry.grid(row=i, column=j)
+            row_entries.append(entry)
+        entries.append(row_entries)
+
+    def submit():
+        matrix = []
+        for row_entries in entries:
+            row = [int(entry.get()) if entry.get().isdigit() else 0 for entry in row_entries]
+            matrix.append(row)
+
+        cnf_file = get_next_cnf_file_name()
+        pb = generate_problem(matrix)
+        dimacs = clauses_to_dimacs(pb, 729)
+        write_dimacs_file(dimacs, cnf_file)
+        cnf_file = os.path.join('cnf', cnf_file)
+        model = exec_gophersat(cnf_file, "./gophersat.exe")
+        grid = model_to_grid(model)
+
+        for i, row in enumerate(grid):
+            for j, cell in enumerate(row):
+                if grid[i][j] != matrix[i][j]:
+                    entries[i][j].config({"background": "light green"})
+                entries[i][j].delete(0, tk.END)
+                entries[i][j].insert(0, str(cell))
+        button.destroy()
+
+    button = tk.Button(root, text="Submit", command=submit)
+    button.grid(row=10, column=0, columnspan=9)
+
+    root.mainloop()
 
 if __name__ == "__main__":
     main()
