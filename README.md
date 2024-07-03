@@ -13,15 +13,15 @@ When solving the grid, SAToku creates a CNF formula representing the Sudoku grid
 To solve a Sudoku grid, simply run the following command:
 
 ```bash
-python3 satoku.py
+python satoku.py
 ```
 
 The user can fill the grid by clicking on the cells and typing the number given by the problem. The user can let the other cells empty or fill them with 0. By clicking on the button, a DIMACS file is created and the empty cells filled with solution are highlighted in green.
 
 In V1, the file given in argument must be a file containing the grid. The grid must be a file formatted stricly as follows:
 
-- 9 lines, each containing 9 digits separated by spaces
-- Empty cells are represented by a 0
+- 9 lines, each containing 9 digits separated by spaces.
+- Empty cells are represented by a 0.
 
 ## Areas of improvement
 
